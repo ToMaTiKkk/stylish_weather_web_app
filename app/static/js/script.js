@@ -86,12 +86,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 li.textContent = displayText;
                 
+                // сохраняем координаты и точное имя, в data-атрибутах
+                li.dataset.cityNmae = cityData.name;
+                if (cityData.latitude !== undefined && cityData.longitude !== undefined) {
+                    li.dataset.lat = cityData.latitude;
+                    li.dataset.lon = cityData.longitude;
+                }
+                
                 li.addEventListener('mousedown', () => {
                     cityInput.value = cityData.name; // вставка только города для поиска
                     autocompleteResultsDiv.innerHTML = '';
                     autocompleteResultsDiv.style.display = 'none';
                     // автоматич сразу поиск
-                    weatherForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+                    fetchWeatherForSelectedCity(cityData.name, cityData.latitude, cityData.longitude);
                 });
                 u1.appendChild(li);
             });
@@ -102,31 +109,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
+    async function fetchWeatherForSelectedCity(cityName, lat, lon) {
+        weatherResultsSection.innerHTML = `<p class="loading-text">Получение прогноза для ${cityName}...</p>`;
+        
+        let apiUrl = `/api/weather/${encodeURIComponent(cityName)}`;
+        // если точные координаты есть то добавляем как query
+        if (lat !== undefined && lon !== undefined) {
+            apiUrl += `?lat=${lat}&lon=${lon}`;
+        }
+        
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ detail: "Неизвестная ошибка сервера"}));
+                throw new Error(errorData.detail ||  `Ошибка: ${response.status}`);
+            }
+            const data = await response.json();
+            displayWeather(data);
+        } catch (error) {
+            console.error('Ошибка при получении погоды:', error);
+        weatherResultsSection.innerHTML = `<p class="error-text">Не удалось загрузить погоду: ${error.message}</p>`;
+        }
+    }
     if (weatherForm) {
         weatherForm.addEventListener('submit', async (event) => {
             event.preventDefault(); // блокируем стандартную отправку формы
-            const cityName = cityInput.value.trim();
+            const cityNameFromInput = cityInput.value.trim();
             
-            if (!cityName) {
+            if (!cityNameFromInput) {
                 weatherResultsSection.innerHTML = `<p class="error-text">Пожалуйста, введите название города.</p>`;
                 return;
             }
             
-            weatherResultsSection.innerHTML = `<p class="loading-text">Получение прогноза для ${cityName}...</p>`;
-            try {
-                const response = await fetch(`/api/weather/${encodeURIComponent(cityName)}`);
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({ detail: "Неизвестная ошибка сервера" })); // попытка получить джсон ошибки
-                    throw new Error(errorData.detail || `Ошибка: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                displayWeather(data);
-                
-            } catch (error) {
-                console.error('Ошибка при получении погоды:', error);
-                weatherResultsSection.innerHTML = `<p class="error-text">Не удалось загрузить погоду: ${error.message}</p>`;
-            }
+         fetchWeatherForSelectedCity(cityNameFromInput, undefined, undefined);
         });
     }
     
