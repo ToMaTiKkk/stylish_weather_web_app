@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Подключаем Inter из Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <title>{{ app_title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
+    <!-- Иконка для вкладки (пока просто эмодзи, потом можно заменить на SVG) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌬️</text></svg>">
+</head>
+<body>
+    <header class="app-header">
+        <div class="container">
+            <h1>{{ app_title }}</h1>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="city-input-section">
+            <h2>Узнать погоду</h2>
+            <form id="weatherForm">
+                <input type="text" id="city" name="city" placeholder="Введите название города..." aria-label="Название города">
+                <button type="submit" class="button-primary">
+                    <span class="button-text">Искать</span>
+                </button>
+            </form>
+        </section>
+
+        <section id="weather-results-section" aria-live="polite">
+            <!-- здесь будет отображаться погода -->
+            <p class="placeholder-text">Введите город, чтобы увидеть прогноз.</p>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <div class="container">
+            <p>© <span id="currentYear"></span> Разработано ToMaTiK. <a href="https://github.com/ToMaTiKkk/stylish_weather_web_app" target="_blank" rel="noopener noreferrer">GitHub</a></p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', path='/js/script.js') }}"></script>
+</body>
+</html>

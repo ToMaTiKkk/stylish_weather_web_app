@@ -1,0 +1,167 @@
+/* базовый сброс и настройки*/
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #1C1B22; /* темный фиолетово-серый фон */
+    color: #EAE6E0; /* светлый теплый серый текст */
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    width: 90%;
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.app-header {
+    background-color: #2A2733; /* чуть светлее фона */
+    padding: 1.5rem 0;
+    text-align: center;
+    border-bottom: 1px solid #3A3743; /* тонкая линия в тон */
+}
+
+.app-header h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #FFC107; /*янтарный/Золотой акцент */
+    letter-spacing: 1px;
+    /* легкая тень тексту для  */
+    text-shadow: 0 0 8px rgba(255, 193, 7, 0.3);
+}
+
+main {
+    flex-grow: 1;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+#city-input-section h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: #EAE6E0;
+}
+
+#weatherForm {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#city {
+    flex-grow: 1;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    border: 1px solid #3A3743; /* граница в тон */
+    border-radius: 6px;
+    background-color: #2A2733; /* фон инпута */
+    color: #EAE6E0;
+    outline: none;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+#city::placeholder {
+    color: #9E9B94;
+}
+
+#city:focus {
+    border-color: #FFC107; /* акцентный цвет при фокусе */
+    box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.25); /* тень при фокусе */
+}
+
+.button-primary {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    background-color: #FFC107; /* акцентный цвет */
+    color: #1C1B22; /* темный текст на светлой кнопке (контраст) */
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.button-primary:hover {
+    background-color: #FFB000; /* чуть темнее/насыщеннее при ховере */
+}
+.button-primary:active {
+    transform: translateY(1px);
+}
+
+.placeholder-text, .loading-text, .error-text { /* объединим стили для сообщений */
+    text-align: center;
+    font-size: 1.1rem;
+    color: #9E9B94;
+    padding: 1rem;
+    background-color: #2A2733
+    border-radius: 6px;
+    border: 1px dashed #3A3743;
+}
+
+.error-text {
+    color: #FF6B6B; /* для ошибок использовать красный, но приглушенный */
+    border-color: #FF6B6B;
+}
+
+.app-footer {
+    background-color: #2A2733;
+    padding: 1.5rem 0;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #9E9B94;
+    border-top: 1px solid #3A3743;
+}
+
+.app-footer a {
+    color: #FFC107; 
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+}
+
+.app-footer a:hover {
+    color: #EAE6E0; 
+}
+
+/* адаптивность базовая */
+@media (max-width: 600px) {
+    .app-header h1 {
+        font-size: 1.5rem;
+    }
+    #city-input-section h2 {
+        font-size: 1.25rem;
+    }
+    #weatherForm {
+        flex-direction: column;
+    }
+    .button-primary {
+        width: 100%;
+    }
+}
