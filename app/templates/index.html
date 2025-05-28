@@ -12,6 +12,10 @@
     <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
     <!-- Иконка для вкладки (пока просто эмодзи, потом можно заменить на SVG) -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌬️</text></svg>">
+          
+    <script>
+        const WMO_CODES_FROM_SERVER = {{ wmo_codes | tojson }}; // Добавил | safe на всякий случай
+    </script>
 </head>
 <body>
     <header class="app-header">

@@ -121,7 +121,7 @@ main {
     font-size: 1.1rem;
     color: #9E9B94;
     padding: 1rem;
-    background-color: #2A2733
+    background-color: #2A2733;
     border-radius: 6px;
     border: 1px dashed #3A3743;
 }
@@ -148,6 +148,140 @@ main {
 
 .app-footer a:hover {
     color: #EAE6E0; 
+}
+
+/* стили для отображения погоды */
+.weather-card {
+    background-color: #2A2733;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #3A3743; /* Тонкая граница */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* мягкая тень */
+}
+
+.weather-card-header h2 {
+    font-size: 1.8rem;
+    color: #FFC107; /* акцентный цвет для заголовка города */
+    margin-bottom: 0.25rem;
+}
+
+.weather-card-header .sub-text {
+    font-size: 0.9rem;
+    color: #9E9B94;
+    margin-bottom: 1rem;
+}
+
+.current-weather-details {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1rem; /* отступ перед прогнозом на 7 дней */
+}
+
+.current-temp {
+    display: flex;
+    align-items: center;
+    font-size: 3rem; /* крупная температура */
+    font-weight: 300; /* тонкое начертание для цифр */
+    color: #EAE6E0;
+}
+
+.current-temp .weather-icon {
+    width: 64px; 
+    height: 64px;
+    margin-right: 1rem;
+    fill: #FFC107;
+}
+
+.current-description p {
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+}
+
+.forecast-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); /* адаптивная сетка */
+    gap: 1rem;
+}
+
+.forecast-day-card {
+    background-color: #312E3A; /* чуть другой фон для карточек прогноза */
+    border-radius: 6px;
+    padding: 1rem;
+    text-align: center;
+    border: 1px solid #423F4A;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.forecast-day-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(255, 193, 7, 0.1);
+}
+
+
+.forecast-day-card h4 {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #FFC107;
+}
+
+.forecast-icon .weather-icon {
+    width: 48px; /* иконки поменьше для прогноза */
+    height: 48px;
+    margin-bottom: 0.5rem;
+    /* fill: #EAE6E0; /* цвет иконок прогноза*/
+}
+
+.forecast-day-card .temps {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+    display: block; /* чтобы занимал всю ширину и desc-small был под ним */
+}
+.max-temp {
+ color: #EAE6E0;
+}
+.min-temp {
+ color: #9E9B94;
+}
+
+
+.forecast-day-card .desc-small {
+    font-size: 0.8rem;
+    color: #9E9B94;
+    min-height: 2.4em; /* чтобы карточки были одной высоты если описания разной длины */
+}
+
+/* для дополнительной информации*/
+.extra-info {
+    font-size: 0.75rem;
+    color: #78756E;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-around; /* или center, или space-between */
+}
+.inline-icon {
+    width: 12px;
+    height: 12px;
+    margin-right: 3px;
+    vertical-align: middle;
+}
+
+
+/* адаптация для очень маленьких экранов если не влезает */
+@media (max-width: 400px) {
+    .forecast-grid {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    }
+    .current-temp {
+        font-size: 2.5rem;
+    }
+    .current-temp .weather-icon {
+        width: 48px;
+        height: 48px;
+    }
 }
 
 /* адаптивность базовая */
