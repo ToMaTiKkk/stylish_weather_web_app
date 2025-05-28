@@ -300,7 +300,7 @@ main {
     border-top: none; /* убираем верхнюю границу, т.к. примыкает к инпуту */
     border-radius: 0 0 6px 6px; /* скругляем только нижние углы */
     z-index: 1000; /* чтобы был поверх других элементов */
-    max-height: 200px; /* ограничиваем высоту, добавляем скролл */
+    max-height: 300px; /* ограничиваем высоту, добавляем скролл */
     overflow-y: auto;
     display: none; /* по умолчанию скрыт */
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
@@ -327,6 +327,11 @@ main {
 .autocomplete-suggestions li:hover {
     background-color: #FFC107; /* акцентный цвет при наведении */
     color: #1C1B22; /* темный текст на акцентном фоне */
+}
+
+.autocomplete-suggestions li.active-suggestion {
+    background-color: #FFC107; 
+    color: #1C1B22;
 }
 
 /* cтили для предложения по последнему городу */

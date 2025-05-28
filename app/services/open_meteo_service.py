@@ -86,7 +86,7 @@ async def get_weather_forecast(latitude: float, longitude: float) -> Optional[Di
             return None
  
 # ищет города для автодопа по фрагменту из названия, включая координаты, и возвращается список словарей о городах с инфо          
-async def search_cities_for_autocomplete(query_fragment: str, count: int = 5) -> List[Dict[str, Any]]:
+async def search_cities_for_autocomplete(query_fragment: str, count: int = 100) -> List[Dict[str, Any]]:
     params = {"name": query_fragment, "count": count, "language": "ru", "format": "json"}
     cities_found = []
     async with httpx.AsyncClient() as client:

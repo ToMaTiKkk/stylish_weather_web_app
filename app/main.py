@@ -90,7 +90,7 @@ async def autocomplete_city_names(query: str):
     if not query or len(query) < 2:
         return [] # для слишком коротких запросов - пустой список
         
-    cities = await open_meteo_service.search_cities_for_autocomplete(query_fragment=query, count=5)
+    cities = await open_meteo_service.search_cities_for_autocomplete(query_fragment=query, count=100)
     return cities
     
 if __name__ == "__main__":

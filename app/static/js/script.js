@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // элемент для отображения подсказок автодопа и добавим в html если его не было
     let autocompleteResultsDiv = document.getElementById('autocomplete-results');
     if (!autocompleteResultsDiv) {
-        autocompleteResultsDiv = document.createEvent('div');
+        autocompleteResultsDiv = document.createElement('div');
         autocompleteResultsDiv.id =  'autocomplete-results';
         autocompleteResultsDiv.className = 'autocomplete-suggestions'; // для стилей
         cityInput.parentNode.insertBefore(autocompleteResultsDiv, cityInput.nextSibling);
@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let autocompleteDebounceTimer;
     const DEBOUNCE_DELAY = 100; // mc
+    let activeSuggestionIndex = -1; // индекс выделенного элемента в списке автодопа
     
     const lastCitySuggestionContainer = document.getElementById('last-city-suggestion');
     const lastCityNameSpan = document.getElementById('last-city-name');
@@ -71,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (cityInput) {
         cityInput.addEventListener('input', () => {
             clearTimeout(autocompleteDebounceTimer);
+            activeSuggestionIndex = -1; // при новом вводе сброс индекса
             const query = cityInput.value.trim();
             
             if (query.length < 2) { // поиск от 2-х символов
@@ -111,16 +113,89 @@ document.addEventListener('DOMContentLoaded', () => {
         
         cityInput.addEventListener('focus', () => {
             // если текст есть, то пробуе мпоказать
-            if (cityInput.value.trim().length >= 2 && autocompleteResultsDiv.children.length() > 0) {
+            if (cityInput.value.trim().length >= 2 && autocompleteResultsDiv.children.length > 0  && autocompleteResultsDiv.querySelector('ul')) {
                 autocompleteResultsDiv.style.display = 'block';
+            }
+        });
+        
+        // обработчик нажатия кнопок при вводе
+        cityInput.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === 'Escape') {
+                const suggestionList = autocompleteResultsDiv.querySelector('ul');
+                const suggestionVisible = autocompleteResultsDiv.style.display === 'block' && suggestionList && suggestionList.children.length > 0;
+                if (e.key === 'Escape') {
+                    if (suggestionVisible) {
+                        e.preventDefault(); // блок других действия для данной кнопки
+                        autocompleteResultsDiv.style.display = 'none';
+                        activeSuggestionIndex = -1;
+                        cityInput.blur();
+                    }
+                    return;
+                }
+                
+                if (!suggestionVisible) {
+                    // если ентер при закрытом допе, то запрос просто отправляется как обычно
+                    // сработает submit обработчик
+                    return;
+                }
+                
+                const items = suggestionList.querySelectorAll('li');
+                if (!items.length && e.key !== 'Enter') {
+                    return;
+                }
+                
+                switch (e.key) {
+                    case 'ArrowDown':
+                        e.preventDefault(); // скролл блокируем
+                        activeSuggestionIndex++;
+                        if (activeSuggestionIndex >= items.length) {
+                            activeSuggestionIndex = 0;
+                        }
+                        updateSuggestionHighlight(items);
+                        break;
+                    case 'ArrowUp':
+                        e.preventDefault();
+                        activeSuggestionIndex--;
+                        if (activeSuggestionIndex < 0) {
+                            activeSuggestionIndex = items.length - 1;
+                        }
+                        updateSuggestionHighlight(items);
+                        break;
+                    case 'Enter':
+                        e.preventDefault();
+                        if (activeSuggestionIndex > -1 && items[activeSuggestionIndex]) {
+                            items[activeSuggestionIndex].dispatchEvent(new Event('mousedown')); // имитация клика
+                        } else {
+                            // если нажали, но ничего не выделено, а может списко и пуст, то скрываем и отправляем запрос
+                            autocompleteResultsDiv.style.display = 'none';
+                            activeSuggestionIndex =-1;
+                            if (cityInput.value.trim()) { // убедимся что есть что отправлять
+                                weatherForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+                            }
+                        }
+                        break;
+                }
             }
         });
     }
     
+    function updateSuggestionHighlight(items) {
+        items.forEach((item, index) => {
+            if (index === activeSuggestionIndex) {
+                item.classList.add('active-suggestion');
+                // прокрутка в элементу если не видим
+                item.scrollIntoView({ behavior: 'smooth', block: 'nearest'});
+            } else {
+                item.classList.remove('active-suggestion');
+            }
+        })
+    }
+    
     function displayAutocompleteResults(cities) {
         autocompleteResultsDiv.innerHTML = ''; // предыдущие рез очищаем
+        activeSuggestionIndex = -1;
         if (cities && cities.length > 0) {
-            const u1 = document.createElement('u1');
+            const ul = document.createElement('ul');
             cities.forEach(cityData => {
                 const li = document.createElement('li');
                 let displayText = cityData.name;
@@ -146,9 +221,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     // автоматич сразу поиск
                     fetchWeatherForSelectedCity(cityData.name, cityData.latitude, cityData.longitude, cityData.admin1, cityData.country);
                 });
-                u1.appendChild(li);
+                ul.appendChild(li);
             });
-            autocompleteResultsDiv.appendChild(u1);
+            autocompleteResultsDiv.appendChild(ul);
             autocompleteResultsDiv.style.display = 'block';
         } else {
             autocompleteResultsDiv.style.display = 'none';
