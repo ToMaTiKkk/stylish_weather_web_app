@@ -85,7 +85,7 @@ async def get_weather_forecast(latitude: float, longitude: float) -> Optional[Di
             print(f"При получении информации о погоде произошла непредвиденная ошибка: {e}")
             return None
  
-# ищет города для автодопа по фрагменту из названия и возвращается список словарей о городах с инфо          
+# ищет города для автодопа по фрагменту из названия, включая координаты, и возвращается список словарей о городах с инфо          
 async def search_cities_for_autocomplete(query_fragment: str, count: int = 5) -> List[Dict[str, Any]]:
     params = {"name": query_fragment, "count": count, "language": "ru", "format": "json"}
     cities_found = []
@@ -101,6 +101,8 @@ async def search_cities_for_autocomplete(query_fragment: str, count: int = 5) ->
                         "name": city_info.get("name", query_fragment),
                         "admin1": city_info.get("admin1"),
                         "country": city_info.get("country"),
+                        "latitude": city_info.get("latitude"),
+                        "longitude": city_info.get("longitude")
                     })
             return cities_found
         except httpx.HTTPStatusError as e:
@@ -108,3 +110,4 @@ async def search_cities_for_autocomplete(query_fragment: str, count: int = 5) ->
             return []
         except Exception as e:
             print(f"При автодополнении поиска произошла непредвиденная ошибка для '{query_fragment}': {e}")
+    return cities_found

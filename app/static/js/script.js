@@ -86,12 +86,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 li.textContent = displayText;
                 
+                // сохраняем координаты и точное имя, в data-атрибутах
+                li.dataset.cityNmae = cityData.name;
+                if (cityData.latitude !== undefined && cityData.longitude !== undefined) {
+                    li.dataset.lat = cityData.latitude;
+                    li.dataset.lon = cityData.longitude;
+                }
+                
                 li.addEventListener('mousedown', () => {
                     cityInput.value = cityData.name; // вставка только города для поиска
                     autocompleteResultsDiv.innerHTML = '';
                     autocompleteResultsDiv.style.display = 'none';
                     // автоматич сразу поиск
-                    weatherForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+                    fetchWeatherForSelectedCity(cityData.name, cityData.latitude, cityData.longitude, cityData.admin1, cityData.country);
                 });
                 u1.appendChild(li);
             });
@@ -102,31 +109,61 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
+    async function fetchWeatherForSelectedCity(baseName, lat, lon, admin1, country) {
+        let displayNameForLoading = baseName;
+        if (admin1 && admin1 !== baseName) {
+            displayNameForLoading += `, ${admin1}`;
+        }
+        if (country) {
+            displayNameForLoading += `, ${country}`;
+        }
+        weatherResultsSection.innerHTML = `<p class="loading-text">Получение прогноза для ${displayNameForLoading}...</p>`;
+        
+        let apiUrl = `/api/weather/${encodeURIComponent(baseName)}`;
+
+        const queryParams = new URLSearchParams();
+        if (lat !== undefined && lon !== undefined) {
+            queryParams.append('lat', lat);
+            queryParams.append('lon', lon);
+            // если есть точные координаты, то передаем и описание города
+            if (baseName) {
+                queryParams.append('selected_name', baseName);
+            }
+            if (admin1) {
+                queryParams.append('selected_admin1', admin1);
+            }
+            if (country) {
+                queryParams.append('selected_country', country);
+            }
+        }
+        if (queryParams.toString()) {
+            apiUrl += `?${queryParams.toString()}`;
+        }
+        
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ detail: "Неизвестная ошибка сервера"}));
+                throw new Error(errorData.detail ||  `Ошибка: ${response.status}`);
+            }
+            const data = await response.json();
+            displayWeather(data);
+        } catch (error) {
+            console.error('Ошибка при получении погоды:', error);
+            weatherResultsSection.innerHTML = `<p class="error-text">Не удалось загрузить погоду: ${error.message}</p>`;
+        }
+    }
     if (weatherForm) {
         weatherForm.addEventListener('submit', async (event) => {
             event.preventDefault(); // блокируем стандартную отправку формы
-            const cityName = cityInput.value.trim();
+            const cityNameFromInput = cityInput.value.trim();
             
-            if (!cityName) {
+            if (!cityNameFromInput) {
                 weatherResultsSection.innerHTML = `<p class="error-text">Пожалуйста, введите название города.</p>`;
                 return;
             }
             
-            weatherResultsSection.innerHTML = `<p class="loading-text">Получение прогноза для ${cityName}...</p>`;
-            try {
-                const response = await fetch(`/api/weather/${encodeURIComponent(cityName)}`);
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({ detail: "Неизвестная ошибка сервера" })); // попытка получить джсон ошибки
-                    throw new Error(errorData.detail || `Ошибка: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                displayWeather(data);
-                
-            } catch (error) {
-                console.error('Ошибка при получении погоды:', error);
-                weatherResultsSection.innerHTML = `<p class="error-text">Не удалось загрузить погоду: ${error.message}</p>`;
-            }
+         fetchWeatherForSelectedCity(cityNameFromInput, undefined, undefined);
         });
     }
     
