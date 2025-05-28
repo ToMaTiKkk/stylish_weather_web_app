@@ -22,6 +22,52 @@ document.addEventListener('DOMContentLoaded', () => {
     let autocompleteDebounceTimer;
     const DEBOUNCE_DELAY = 100; // mc
     
+    const lastCitySuggestionContainer = document.getElementById('last-city-suggestion');
+    const lastCityNameSpan = document.getElementById('last-city-name');
+    const showLastCityButton = document.getElementById('show-last-city-weather');
+    
+    // сохранени последнего города
+    function saveLastSearchedCity(cityInfo) {
+        // полностью инфо сохраняем, чтобы при восстановлении был корректный город
+        if (cityInfo && cityInfo.name && cityInfo.latitude !== undefined && cityInfo.longitude !== undefined) {
+            localStorage.setItem('lastSearchedCityDetails', JSON.stringify(cityInfo));
+        }
+    }
+    
+    // загрущка и отображения предложения этого последнего города
+    function loadAndShowLastCitySuggestion() {
+        const lastCityDetailString = localStorage.getItem('lastSearchedCityDetails');
+        if (lastCityDetailString && lastCitySuggestionContainer && lastCityNameSpan && showLastCityButton) {
+            try {
+                const cityDetails = JSON.parse(lastCityDetailString);
+                let displayText = cityDetails.name;
+                if (cityDetails.admin1 && cityDetails.admin1 !== cityDetails.name) {
+                    displayText += `, ${cityDetails.admin1}`;
+                }
+                if (cityDetails.country) {
+                    displayText += `, ${cityDetails.country}`;
+                }
+                lastCityNameSpan.textContent = displayText;
+                lastCitySuggestionContainer.style.display = 'block'; // показываем блок
+                
+                showLastCityButton.onclick = () => {
+                    // для обратной связи визуальной, заполняем поле ввода городом
+                    cityInput.value = cityDetails.name;
+                    // запрос погоду по координатам
+                    fetchWeatherForSelectedCity(cityDetails.name, cityDetails.latitude, cityDetails.longitude, cityDetails.admin1, cityDetails.country);
+                    lastCitySuggestionContainer.style.display = 'none'; // скрываем после клика
+                };
+            } catch (e) {
+                console.error("Ошибка при разборе lastSearchedCityDetails из localStorage:", e);
+                localStorage.removeItem('lastSearchedCityDetails');
+            }
+        } else if (lastCitySuggestionContainer) {
+            lastCitySuggestionContainer.style.display = 'none'; //  скрываем при отсутсвии данных
+        }
+    }
+    
+    loadAndShowLastCitySuggestion(); // при загрузке страницы
+    
     if (cityInput) {
         cityInput.addEventListener('input', () => {
             clearTimeout(autocompleteDebounceTimer);
@@ -148,6 +194,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const data = await response.json();
             displayWeather(data);
+            
+            // сохраняем последний город
+            if (data && data.city_info) {
+                saveLastSearchedCity(data.city_info)
+                // обновляем предложение, чтобы был уже другой город
+                loadAndShowLastCitySuggestion(); 
+            }
         } catch (error) {
             console.error('Ошибка при получении погоды:', error);
             weatherResultsSection.innerHTML = `<p class="error-text">Не удалось загрузить погоду: ${error.message}</p>`;
