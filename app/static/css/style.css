@@ -72,7 +72,7 @@ main {
 }
 
 #city {
-    flex-grow: 1;
+    width: 100%;
     padding: 0.75rem 1rem;
     font-size: 1rem;
     font-family: 'Inter', sans-serif;
@@ -215,7 +215,7 @@ main {
 }
 .forecast-day-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(255, 193, 7, 0.1);
+    box-shadow: 0 6px 12px rgba(255, 193, 7, 0.2);
 }
 
 .forecast-day-card h4 {
@@ -267,6 +267,7 @@ main {
     height: 12px;
     margin-right: 3px;
     vertical-align: middle;
+    filter: invert(96%) sepia(2%) saturate(168%) hue-rotate(314deg) brightness(115%) contrast(84%);
 }
 
 /* адаптация для очень маленьких экранов если не влезает */
@@ -281,6 +282,51 @@ main {
         width: 48px;
         height: 48px;
     }
+}
+
+/* для обертки инпута и автодополнения */
+.input-wrapper {
+    position: relative; /* для позиционирования списка подсказок */
+    flex-grow: 1; /* чтобы занимал доступное место в форме */
+}
+
+.autocomplete-suggestions {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%; /* располагаем сразу под инпутом */
+    background-color: #312E3A; /* такой же фон, как у инпутов/карточек */
+    border: 1px solid #423F4A;
+    border-top: none; /* убираем верхнюю границу, т.к. примыкает к инпуту */
+    border-radius: 0 0 6px 6px; /* скругляем только нижние углы */
+    z-index: 1000; /* чтобы был поверх других элементов */
+    max-height: 200px; /* ограничиваем высоту, добавляем скролл */
+    overflow-y: auto;
+    display: none; /* по умолчанию скрыт */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.autocomplete-suggestions ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.autocomplete-suggestions li {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    color: #EAE6E0;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #423F4A; /* разделитель между элементами */
+    transition: background-color 0.15s ease-in-out;
+}
+.autocomplete-suggestions li:last-child {
+    border-bottom: none; /* убираем границу у последнего элемента */
+}
+
+.autocomplete-suggestions li:hover {
+    background-color: #FFC107; /* акцентный цвет при наведении */
+    color: #1C1B22; /* темный текст на акцентном фоне */
 }
 
 /* адаптивность базовая */

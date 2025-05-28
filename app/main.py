@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
+from typing import List, Dict, Any
 import uvicorn
 
 # импортируем свои сервисы и WMO_CODES
@@ -49,6 +50,15 @@ async def get_weather_data_for_city(city_name: str):
         "weather": weather_data
     }
     return JSONResponse(content=full_response)
+
+# для автодопа посика
+@app.get("/api/autocomplete/cities", response_model=List[Dict[str, Any]]) # указываем модель ответа для оптимизации
+async def autocomplete_city_names(query: str):
+    if not query or len(query) < 2:
+        return [] # для слишком коротких запросов - пустой список
+        
+    cities = await open_meteo_service.search_cities_for_autocomplete(query_fragment=query, count=5)
+    return cities
     
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

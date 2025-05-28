@@ -84,3 +84,27 @@ async def get_weather_forecast(latitude: float, longitude: float) -> Optional[Di
         except Exception as e:
             print(f"При получении информации о погоде произошла непредвиденная ошибка: {e}")
             return None
+ 
+# ищет города для автодопа по фрагменту из названия и возвращается список словарей о городах с инфо          
+async def search_cities_for_autocomplete(query_fragment: str, count: int = 5) -> List[Dict[str, Any]]:
+    params = {"name": query_fragment, "count": count, "language": "ru", "format": "json"}
+    cities_found = []
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(GEOCODING_API_URL, params=params)
+            response.raise_for_status()
+            data = response.json()
+            
+            if "results" in data and len(data["results"]) > 0:
+                for city_info in data["results"]:
+                    cities_found.append({
+                        "name": city_info.get("name", query_fragment),
+                        "admin1": city_info.get("admin1"),
+                        "country": city_info.get("country"),
+                    })
+            return cities_found
+        except httpx.HTTPStatusError as e:
+            print(f"При автодополнении поиска произошла HTTP ошибка для '{query_fragment}': {e.response.status_code} - {e.response.text}")
+            return []
+        except Exception as e:
+            print(f"При автодополнении поиска произошла непредвиденная ошибка для '{query_fragment}': {e}")

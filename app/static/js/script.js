@@ -10,6 +10,97 @@ document.addEventListener('DOMContentLoaded', () => {
     const weatherResultsSection = document.getElementById('weather-results-section')
     // от main.py 
     const WMO_CODES = typeof WMO_CODES_FROM_SERVER !== "undefined" ? WMO_CODES_FROM_SERVER : {};
+    // элемент для отображения подсказок автодопа и добавим в html если его не было
+    let autocompleteResultsDiv = document.getElementById('autocomplete-results');
+    if (!autocompleteResultsDiv) {
+        autocompleteResultsDiv = document.createEvent('div');
+        autocompleteResultsDiv.id =  'autocomplete-results';
+        autocompleteResultsDiv.className = 'autocomplete-suggestions'; // для стилей
+        cityInput.parentNode.insertBefore(autocompleteResultsDiv, cityInput.nextSibling);
+    }
+    
+    let autocompleteDebounceTimer;
+    const DEBOUNCE_DELAY = 100; // mc
+    
+    if (cityInput) {
+        cityInput.addEventListener('input', () => {
+            clearTimeout(autocompleteDebounceTimer);
+            const query = cityInput.value.trim();
+            
+            if (query.length < 2) { // поиск от 2-х символов
+                autocompleteResultsDiv.innerHTML = '';
+                autocompleteResultsDiv.style.display = 'none';
+                return;
+            }
+            
+            autocompleteDebounceTimer = setTimeout(async () => {
+                try {
+                    const response = await fetch(`/api/autocomplete/cities?query=${encodeURIComponent(query)}`);
+                    if (!response.ok) {
+                        // при ошибке не будем уведомлять об этом, а просто подсказок не будет
+                        console.error(`Ошибка сети при автодополнении: ${response.status}`);
+                        autocompleteResultsDiv.innerHTML = '';
+                        autocompleteResultsDiv.style.display = 'none';
+                        return;
+                    }
+                    const cities = await response.json();
+                    displayAutocompleteResults(cities);
+                } catch (error) {
+                    console.log('Ошибка автодополнения:', error);
+                    autocompleteResultsDiv.innerHTML = '';
+                    autocompleteResultsDiv.style.display = 'none';
+                }
+            }, DEBOUNCE_DELAY);
+        });
+        
+        // фокус теряется и автодоп скрывается если не нажали на список
+        cityInput.addEventListener('blur', () => {
+            // задержка чтобы можно успеть кликнуть по элементу списка
+            setTimeout(() => {
+                if (!autocompleteResultsDiv.matches(':hover')) { // если мышка над списком
+                    autocompleteResultsDiv.style.display = 'none';
+                }
+            }, 150);
+        });
+        
+        cityInput.addEventListener('focus', () => {
+            // если текст есть, то пробуе мпоказать
+            if (cityInput.value.trim().length >= 2 && autocompleteResultsDiv.children.length() > 0) {
+                autocompleteResultsDiv.style.display = 'block';
+            }
+        });
+    }
+    
+    function displayAutocompleteResults(cities) {
+        autocompleteResultsDiv.innerHTML = ''; // предыдущие рез очищаем
+        if (cities && cities.length > 0) {
+            const u1 = document.createElement('u1');
+            cities.forEach(cityData => {
+                const li = document.createElement('li');
+                let displayText = cityData.name;
+                if (cityData.admin1 && cityData.admin1 != cityData.name) { // если регион = городу, то регион не пишем
+                    displayText += `, ${cityData.admin1}`;
+                }
+                if (cityData.country) {
+                    displayText += `, ${cityData.country}`;
+                }
+                li.textContent = displayText;
+                
+                li.addEventListener('mousedown', () => {
+                    cityInput.value = cityData.name; // вставка только города для поиска
+                    autocompleteResultsDiv.innerHTML = '';
+                    autocompleteResultsDiv.style.display = 'none';
+                    // автоматич сразу поиск
+                    weatherForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+                });
+                u1.appendChild(li);
+            });
+            autocompleteResultsDiv.appendChild(u1);
+            autocompleteResultsDiv.style.display = 'block';
+        } else {
+            autocompleteResultsDiv.style.display = 'none';
+        }
+    }
     
     if (weatherForm) {
         weatherForm.addEventListener('submit', async (event) => {

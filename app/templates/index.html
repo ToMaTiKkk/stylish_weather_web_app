@@ -28,7 +28,10 @@
         <section id="city-input-section">
             <h2>Узнать погоду</h2>
             <form id="weatherForm">
-                <input type="text" id="city" name="city" placeholder="Введите название города..." aria-label="Название города">
+                <div class="input-wrapper"> <!-- обертка для инпута и подсказок -->
+                    <input type="text" id="city" name="city" placeholder="Введите название города..." aria-label="Название города" autocomplete="off">
+                    <div id="autocomplete-results" class="autocomplete-suggestions"></div> <!-- сюда будут падать подсказки -->
+                </div>
                 <button type="submit" class="button-primary">
                     <span class="button-text">Искать</span>
                 </button>
