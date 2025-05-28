@@ -25,6 +25,15 @@
     </header>
 
     <main class="container">
+        <section id="last-city-suggestion-wrapper" style="margin-bottom: 1.5rem;"> <!-- Добавим обертку для отступа -->
+            <div id="last-city-suggestion" class="last-city-prompt" style="display: none;">
+                <p>
+                    Недавно вы искали: <strong id="last-city-name"></strong>.
+                    <button id="show-last-city-weather" class="button-secondary">Показать погоду</button>
+                </p>
+            </div>
+        </section>
+        
         <section id="city-input-section">
             <h2>Узнать погоду</h2>
             <form id="weatherForm">

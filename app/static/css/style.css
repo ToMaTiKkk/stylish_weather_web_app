@@ -300,7 +300,7 @@ main {
     border-top: none; /* убираем верхнюю границу, т.к. примыкает к инпуту */
     border-radius: 0 0 6px 6px; /* скругляем только нижние углы */
     z-index: 1000; /* чтобы был поверх других элементов */
-    max-height: 200px; /* ограничиваем высоту, добавляем скролл */
+    max-height: 300px; /* ограничиваем высоту, добавляем скролл */
     overflow-y: auto;
     display: none; /* по умолчанию скрыт */
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
@@ -329,7 +329,59 @@ main {
     color: #1C1B22; /* темный текст на акцентном фоне */
 }
 
-/* адаптивность базовая */
+.autocomplete-suggestions li.active-suggestion {
+    background-color: #FFC107; 
+    color: #1C1B22;
+}
+
+/* cтили для предложения по последнему городу */
+.last-city-prompt {
+    background-color: #312E3A; 
+    padding: 0.75rem 1.25rem;
+    border-radius: 6px;
+    border: 1px solid #423F4A;
+    text-align: center;
+    font-size: 0.95rem;
+}
+
+.last-city-prompt p {
+    margin: 0;
+    color: #EAE6E0;
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap; /* для переноса на малых экранах */
+    gap: 0.5rem; /* пространство между элементами */
+}
+
+.last-city-prompt strong {
+    color: #FFC107; /* акцентный цвет для имени города */
+    font-weight: 500;
+}
+
+/* стили для вторичной кнопки*/
+.button-secondary {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    background-color: transparent;
+    color: #FFC107; /* акцентный цвет текста */
+    border: 1px solid #FFC107; /* акцентная рамка */
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.button-secondary:hover {
+    background-color: rgba(255, 193, 7, 0.1); /* легкий фон при ховере */
+    color: #FFD44C;
+}
+.button-secondary:active {
+    background-color: rgba(255, 193, 7, 0.2);
+}
+
+/* адаптивность */
 @media (max-width: 600px) {
     .app-header h1 {
         font-size: 1.5rem;
@@ -342,5 +394,13 @@ main {
     }
     .button-primary {
         width: 100%;
+    }
+    .last-city-prompt p {
+        flex-direction: column; /* текст и кнопка друг под другом */
+        gap: 0.75rem;
+    }
+    .button-secondary {
+        width: auto; /* не на всю ширину, если в столбик */
+        padding: 0.5rem 1rem;
     }
 }
