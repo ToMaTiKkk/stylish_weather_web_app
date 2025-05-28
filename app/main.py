@@ -31,24 +31,34 @@ async def read_root(request: Request):
 
 # эндпоинт для получения погоды
 @app.get("/api/weather/{city_name}")
-async def get_weather_data_for_city(city_name: str, lat: Optional[float] = Query(None), lon: Optional[float] = Query(None)):
+async def get_weather_data_for_city(
+            city_name: str, 
+            lat: Optional[float] = Query(None), 
+            lon: Optional[float] = Query(None),
+            selected_name: Optional[str] = Query(None),
+            selected_admin1: Optional[str] = Query(None),
+            selected_country: Optional[str] = Query(None)):
     # если координаты переданы, то прямое получение погоды по координатам, иначе геокодируется город
     final_city_name = city_name; # имя для отображения и овтета
     latitude = lat
     longitude = lon
     city_details_for_response = {} 
+    
     if latitude is not None and longitude is not None:
         # пока что дял простоты в city_info будет то, что передано с фронта, и без страны с регионом
         print(f"Получение погоды по координатам: lat={latitude}, lon={longitude} для города (приблизительно) {city_name}")
-        city_details_for_response = {"name": city_name, "latitude": latitude, "longitude": longitude}
-        city_coords_from_name = await open_meteo_service.get_city_coordinates(city_name)
-        if city_coords_from_name:
-            city_details_for_response = city_coords_from_name; # полные данные юзаем
-            final_city_name = city_coords_from_name.get("name", city_name)
-        else:
-            # если по имени найти не удалось, то используем как есть
-            city_details_for_response = {"name": city_name, "latitude": latitude, "longitude": longitude, "country": "N/A", "admin1": "N/A"}
+        print(f"Детали города из запроса: name='{selected_name}', admin1='{selected_admin1}', country='{selected_country}'")
+        
+        city_details_for_response = {
+            "name": selected_name if selected_name else city_name,
+            "admin1": selected_admin1,
+            "country": selected_country,
+            "latitude": latitude, 
+            "longitude": longitude
+            }
     else: # если координаты не переданы
+        # если пользователь просто ввел город и нажал Enter
+        print(f"Координаты не переданы, геокодирование по имени: '{city_name}'")
         if not city_name:
             raise HTTPException(status_code=400, detail="Название города не может быть пустым.")
         
@@ -58,7 +68,7 @@ async def get_weather_data_for_city(city_name: str, lat: Optional[float] = Query
         
         latitude = city_coords["latitude"]
         longitude = city_coords["longitude"]
-        final_city_name = city_coords.get("name", city_name)
+        #final_city_name = city_coords.get("name", city_name)
         city_details_for_response = city_coords
         
     # получаем сам прогноз по определенным координатам
@@ -71,6 +81,7 @@ async def get_weather_data_for_city(city_name: str, lat: Optional[float] = Query
         "city_info":city_details_for_response, # используем или собранные или найденные данный
         "weather": weather_data
     }
+    print(f"Отправка ответа с city_info: {city_details_for_response}")
     return JSONResponse(content=full_response)
 
 # для автодопа посика

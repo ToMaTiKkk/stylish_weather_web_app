@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     autocompleteResultsDiv.innerHTML = '';
                     autocompleteResultsDiv.style.display = 'none';
                     // автоматич сразу поиск
-                    fetchWeatherForSelectedCity(cityData.name, cityData.latitude, cityData.longitude);
+                    fetchWeatherForSelectedCity(cityData.name, cityData.latitude, cityData.longitude, cityData.admin1, cityData.country);
                 });
                 u1.appendChild(li);
             });
@@ -109,13 +109,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    async function fetchWeatherForSelectedCity(cityName, lat, lon) {
-        weatherResultsSection.innerHTML = `<p class="loading-text">Получение прогноза для ${cityName}...</p>`;
+    async function fetchWeatherForSelectedCity(baseName, lat, lon, admin1, country) {
+        let displayNameForLoading = baseName;
+        if (admin1 && admin1 !== baseName) {
+            displayNameForLoading += `, ${admin1}`;
+        }
+        if (country) {
+            displayNameForLoading += `, ${country}`;
+        }
+        weatherResultsSection.innerHTML = `<p class="loading-text">Получение прогноза для ${displayNameForLoading}...</p>`;
         
-        let apiUrl = `/api/weather/${encodeURIComponent(cityName)}`;
-        // если точные координаты есть то добавляем как query
+        let apiUrl = `/api/weather/${encodeURIComponent(baseName)}`;
+
+        const queryParams = new URLSearchParams();
         if (lat !== undefined && lon !== undefined) {
-            apiUrl += `?lat=${lat}&lon=${lon}`;
+            queryParams.append('lat', lat);
+            queryParams.append('lon', lon);
+            // если есть точные координаты, то передаем и описание города
+            if (baseName) {
+                queryParams.append('selected_name', baseName);
+            }
+            if (admin1) {
+                queryParams.append('selected_admin1', admin1);
+            }
+            if (country) {
+                queryParams.append('selected_country', country);
+            }
+        }
+        if (queryParams.toString()) {
+            apiUrl += `?${queryParams.toString()}`;
         }
         
         try {
@@ -128,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
             displayWeather(data);
         } catch (error) {
             console.error('Ошибка при получении погоды:', error);
-        weatherResultsSection.innerHTML = `<p class="error-text">Не удалось загрузить погоду: ${error.message}</p>`;
+            weatherResultsSection.innerHTML = `<p class="error-text">Не удалось загрузить погоду: ${error.message}</p>`;
         }
     }
     if (weatherForm) {
