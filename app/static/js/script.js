@@ -199,7 +199,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data && data.city_info) {
                 saveLastSearchedCity(data.city_info)
                 // обновляем предложение, чтобы был уже другой город
-                loadAndShowLastCitySuggestion(); 
+            }
+            
+            // скрываем недавний поиск после успешного нового
+            if (lastCitySuggestionContainer) {
+                lastCitySuggestionContainer.style.display = 'none';
             }
         } catch (error) {
             console.error('Ошибка при получении погоды:', error);

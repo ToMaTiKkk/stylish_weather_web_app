@@ -334,7 +334,6 @@ main {
     background-color: #312E3A; 
     padding: 0.75rem 1.25rem;
     border-radius: 6px;
-    margin-bottom: 1.5rem; /* отступ перед формой */
     border: 1px solid #423F4A;
     text-align: center;
     font-size: 0.95rem;
