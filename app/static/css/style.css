@@ -14,8 +14,8 @@ html {
 
 body {
     font-family: 'Inter', sans-serif;
-    background-color: #1C1B22; /* темный фиолетово-серый фон */
-    color: #EAE6E0; /* светлый теплый серый текст */
+    background-color: #23202A; /* темный фиолетово-серый фон */
+    color: #F0F0F0; /* светлый теплый серый текст */
     line-height: 1.6;
     display: flex;
     flex-direction: column;
@@ -34,10 +34,10 @@ body {
 }
 
 .app-header {
-    background-color: #2A2733; /* чуть светлее фона */
+    background-color: #312E3A; /* чуть светлее фона */
     padding: 1.5rem 0;
     text-align: center;
-    border-bottom: 1px solid #3A3743; /* тонкая линия в тон */
+    border-bottom: 1px solid #423F4A; /* тонкая линия чуть светлее */
 }
 
 .app-header h1 {
@@ -46,7 +46,7 @@ body {
     color: #FFC107; /*янтарный/Золотой акцент */
     letter-spacing: 1px;
     /* легкая тень тексту для  */
-    text-shadow: 0 0 8px rgba(255, 193, 7, 0.3);
+    text-shadow: 0 0 5px rgba(255, 193, 7, 0.2);
 }
 
 main {
@@ -76,21 +76,21 @@ main {
     padding: 0.75rem 1rem;
     font-size: 1rem;
     font-family: 'Inter', sans-serif;
-    border: 1px solid #3A3743; /* граница в тон */
+    border: 1px solid #423F4A; /* граница чуть светлее */
     border-radius: 6px;
-    background-color: #2A2733; /* фон инпута */
-    color: #EAE6E0;
+    background-color: #312E3A; /* фон карточки */
+    color: #F0F0F0;
     outline: none;
     transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
 #city::placeholder {
-    color: #9E9B94;
+    color: #A8A59E;
 }
 
 #city:focus {
     border-color: #FFC107; /* акцентный цвет при фокусе */
-    box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.25); /* тень при фокусе */
+    box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.3); /* тень при фокусе */
 }
 
 .button-primary {
@@ -121,9 +121,9 @@ main {
     font-size: 1.1rem;
     color: #9E9B94;
     padding: 1rem;
-    background-color: #2A2733;
+    background-color: #312E3A; 
     border-radius: 6px;
-    border: 1px dashed #3A3743;
+    border: 1px dashed #4A4753;
 }
 
 .error-text {
@@ -132,12 +132,12 @@ main {
 }
 
 .app-footer {
-    background-color: #2A2733;
+    background-color: #312E3A;
     padding: 1.5rem 0;
     text-align: center;
     font-size: 0.9rem;
     color: #9E9B94;
-    border-top: 1px solid #3A3743;
+    border-top: 1px solid #423F4A;
 }
 
 .app-footer a {
@@ -152,12 +152,12 @@ main {
 
 /* стили для отображения погоды */
 .weather-card {
-    background-color: #2A2733;
+    background-color: #312E3A;
     border-radius: 8px;
     padding: 1.5rem;
     margin-bottom: 2rem;
     border: 1px solid #3A3743; /* Тонкая граница */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* мягкая тень */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25); /* мягкая тень */
 }
 
 .weather-card-header h2 {
@@ -191,7 +191,7 @@ main {
     width: 64px; 
     height: 64px;
     margin-right: 1rem;
-    fill: #FFC107;
+    filter: invert(77%) sepia(61%) saturate(1352%) hue-rotate(359deg) brightness(104%) contrast(104%); /* Золотой фильтр */
 }
 
 .current-description p {
@@ -218,7 +218,6 @@ main {
     box-shadow: 0 6px 12px rgba(255, 193, 7, 0.1);
 }
 
-
 .forecast-day-card h4 {
     font-size: 0.9rem;
     font-weight: 500;
@@ -230,7 +229,7 @@ main {
     width: 48px; /* иконки поменьше для прогноза */
     height: 48px;
     margin-bottom: 0.5rem;
-    /* fill: #EAE6E0; /* цвет иконок прогноза*/
+    filter: invert(96%) sepia(2%) saturate(168%) hue-rotate(314deg) brightness(115%) contrast(84%);
 }
 
 .forecast-day-card .temps {
@@ -239,13 +238,14 @@ main {
     margin-bottom: 0.3rem;
     display: block; /* чтобы занимал всю ширину и desc-small был под ним */
 }
+
 .max-temp {
- color: #EAE6E0;
-}
-.min-temp {
- color: #9E9B94;
+ color: #F0F0F0;
 }
 
+.min-temp {
+ color: #B0AEAA;
+}
 
 .forecast-day-card .desc-small {
     font-size: 0.8rem;
@@ -268,7 +268,6 @@ main {
     margin-right: 3px;
     vertical-align: middle;
 }
-
 
 /* адаптация для очень маленьких экранов если не влезает */
 @media (max-width: 400px) {

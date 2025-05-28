@@ -115,6 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function renderWeatherIcon(code, isDay = true) {
         const wmoEntry = WMO_CODES[code];
+        let iconClass = "weather-icon color-primary-text";
         if (wmoEntry) {
             const iconName = isDay ? wmoEntry.icon_day : wmoEntry.icon_night;
             if (iconName) {
