@@ -1,7 +1,9 @@
 import pytest
 import uuid
+import asyncio
 from httpx import AsyncClient
 from fastapi import status
+from sqlalchemy.orm import Session
 
 from app.schemas import history_schema
 from app.services import open_meteo_service
@@ -147,4 +149,48 @@ async def test_autocomplete_cities_short_query(client: AsyncClient):
     query = "М"
     response = await client.get(f"/api/autocomplete/cities?query={query}")
     assert response.status_code == status.HTTP_200_OK # пустой списко возвращает
+    assert response.json() == []
+    
+# api статистика по городам всем
+async def test_get_city_search_stats_success(client: AsyncClient, db_session: Session):
+    from app.crud.history_crud import create_search_record
+    create_search_record(db_session, user_id="user1", city_name="Париж", admin1=" Иль-де-Франс", country="Франция", latitude=1.0, longitude=1.0)
+    create_search_record(db_session, user_id="user2", city_name="Париж", admin1=" Иль-de-Франс", country="Франция", latitude=1.0, longitude=1.0) # намеренно опечатка в admin1 для теста
+    create_search_record(db_session, user_id="user1", city_name="Берлин", admin1="Берлин", country="Германия", latitude=2.0, longitude=2.0)
+    
+    response = await client.get("/api/stats/city-searches")
+    assert response.status_code == status.HTTP_200_OK
+    stats_list = response.json()
+    # в словарь для удобства проверки
+    stats_dict = {item["city_name"]: item["search_count"] for item in stats_list}
+    
+    assert stats_dict.get("Париж") == 2 # по названию статистика, должно быть два парижа, два раза искался
+    assert stats_dict.get("Берлин") == 1
+    # проверка сортировки, париж должен быть первым
+    assert stats_list[0]["city_name"] == "Париж"
+    
+# api истории для текущего пользователя
+async def test_get_user_history_success(client: AsyncClient, db_session: Session):
+    user_id = "history-user"
+    cookies = {"user_id": user_id}
+    from app.crud.history_crud import create_search_record
+    # в обратно порядке по времени, чтобы проверить сортировку по времени
+    create_search_record(db_session, user_id=user_id, city_name="Рим", admin1="Лацио", country="Италия", latitude=3.0, longitude=3.0)
+    create_search_record(db_session, user_id=user_id, city_name="Мадрид", admin1="Мадрид", country="Испания", latitude=4.0, longitude=4.0)
+    create_search_record(db_session, user_id="other-user", city_name="Вена", admin1="Вена", country="Австрия", latitude=5.0, longitude=5.0) # запись от другого пользователя
+    
+    client.cookies = cookies
+    response = await client.get("/api/history/user?limit=5")
+    assert response.status_code == status.HTTP_200_OK
+    history_items = response.json()
+    
+    assert len(history_items) == 2
+    assert history_items[0]["city_name"] == "Мадрид"
+    assert history_items[1]["city_name"] == "Рим"
+    assert "latitude" in history_items[0]
+    
+# api истории пользователя без куки
+async def test_get_user_history_no_cookie(client: AsyncClient):
+    response = await client.get("/api/history/user")
+    assert response.status_code == status.HTTP_200_OK # пустой список возвращается
     assert response.json() == []

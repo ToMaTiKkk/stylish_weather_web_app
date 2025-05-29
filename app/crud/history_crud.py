@@ -35,5 +35,6 @@ def get_city_search_stats(db: Session) -> List[history_schema.CitySearchStat]:
 
 # получает последние N записи поиска для конкретного пользователя и возвращает списков объектов типа SearchHistory    
 def get_user_search_history(db: Session, user_id: str, limit: int = 10) -> List[history_model.SearchHistory]:
-    history_entries = db.query(history_model.SearchHistory).filter(history_model.SearchHistory.user_id == user_id).order_by(desc(history_model.SearchHistory.search_timestamp)).limit(limit).all()
+    # если время одинаково, то записи сортируются по id в убывающем порядке, тот, кто позже вставлен, у того айди и больше и при сортировке будет первым
+    history_entries = db.query(history_model.SearchHistory).filter(history_model.SearchHistory.user_id == user_id).order_by(desc(history_model.SearchHistory.search_timestamp), desc(history_model.SearchHistory.id)).limit(limit).all()
     return history_entries
