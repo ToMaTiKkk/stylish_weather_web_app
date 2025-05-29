@@ -3,3 +3,7 @@ uvicorn[standard]
 jinja2
 httpx
 sqlalchemy
+pytest
+pytest-asyncio
+pytest-cov
+pytest-mock
