@@ -8,7 +8,7 @@ from ..schemas import history_schema
 # создает новую запись в истории поиска
 # возвращает созданный объект типа SearchHistory
 def create_search_record(db: Session, user_id: str, city_name: str, admin1: Optional[str] = None, country: Optional[str] = None, latitude: Optional[float] = None, longitude: Optional[float] = None) -> history_model.SearchHistory:
-    db_search_entry = history_model.SearchHistory(user_id=user_id, city_name=city_name, latitude=latitude, longitude=longitude)
+    db_search_entry = history_model.SearchHistory(user_id=user_id, city_name=city_name, admin1=admin1, country=country, latitude=latitude, longitude=longitude)
     db.add(db_search_entry)
     db.commit()
     db.refresh(db_search_entry) # обновляем объект из дб чтобы получить id и время сохрана
