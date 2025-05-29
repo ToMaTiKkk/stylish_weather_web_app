@@ -38,7 +38,7 @@ async def read_root(request: Request, user_id_cookie: Optional[str] = Cookie(Non
             "app_title": app.title,
             "wmo_codes": open_meteo_service.WMO_CODES
     }
-    response = templates.TemplateResponse("index.html", context)
+    response = templates.TemplateResponse(request, "index.html", context)
     
     if not user_id_cookie:
         new_user_id  = str(uuid.uuid4())

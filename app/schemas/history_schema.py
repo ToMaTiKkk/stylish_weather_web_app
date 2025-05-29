@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import List
 from datetime import datetime
 from typing import Optional
@@ -8,8 +8,7 @@ class CitySearchStat(BaseModel):
     city_name: str
     search_count: int
     
-    class Config:
-        from_attributes = True # pydantic может работать с объектами из SQLAlchemy
+    model_config = ConfigDict(from_attributes=True)
         
 # схема для отображения одной записи в истории пользователя
 class UserHistoryItem(BaseModel):
@@ -20,5 +19,4 @@ class UserHistoryItem(BaseModel):
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
