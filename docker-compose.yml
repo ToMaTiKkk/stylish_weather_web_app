@@ -1,0 +1,14 @@
+services:
+    stylish-weather-web-app:
+        build:
+            context: . # текущая дир
+            dockerfile: Dockerfile
+            
+        container_name: stylish_weather_web_app_container
+        
+        ports:
+            - "8000:8000"
+            
+        volumes:
+            # чтобы при перезапуске контейнера бд не удалилась и данные не потерялись, они сохраняются локальноно на хосте
+            - ./stylish_weather_web_app.db:/app/stylish_weather_web_app.db
