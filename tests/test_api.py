@@ -125,3 +125,26 @@ async def test_get_weather_lat_on_success(client: AsyncClient, mocker, db_sessio
     history_entry = db_session.query(SearchHistory).filter_by(user_id=user_id, city_name=selected_name, country=selected_country).first() # в бддолжно пойти точное имя
     assert history_entry is not None
     assert history_entry.latitude == lat
+    
+# тест успешного автодопа
+async def test_autocomplete_cities_success(client: AsyncClient, mocker):
+    query = "Мос"
+    mock_autocomplete_response = [
+        {"name": "Москва", "admin1": "Москва", "country": "Россия", "latitude": 55.75, "longitude": 37.62},
+        {"name": "Мосул", "admin1": "Найнава", "country": "Ирак", "latitude": 36.34, "longitude": 43.13},
+    ]
+    mocker.patch("app.services.open_meteo_service.search_cities_for_autocomplete", return_value=mock_autocomplete_response)
+    
+    response = await client.get(f"/api/autocomplete/cities?query={query}")
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+    assert len(data) == 2
+    assert data[0]["name"] == "Москва"
+    assert "latitude" in data[0] # проверка что координаты есть
+    
+# тест автодопа со слишком коротким запросом
+async def test_autocomplete_cities_short_query(client: AsyncClient):
+    query = "М"
+    response = await client.get(f"/api/autocomplete/cities?query={query}")
+    assert response.status_code == status.HTTP_200_OK # пустой списко возвращает
+    assert response.json() == []
