@@ -8,6 +8,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+     
     <title>{{ app_title }}</title>
     <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
     <!-- Иконка для вкладки (пока просто эмодзи, потом можно заменить на SVG) -->
@@ -49,7 +54,15 @@
 
         <section id="weather-results-section" aria-live="polite">
             <!-- здесь будет отображаться погода -->
-            <p class="placeholder-text">Введите город, чтобы увидеть прогноз.</p>
+            <div id="weather-cards-placeholder"> 
+                <!-- cюда будем вставляются карточки погоды -->
+                <p class="placeholder-text">Введите город, чтобы увидеть прогноз.</p> 
+            </div>
+    
+            <div id="weather-map-container" style="display: none;">
+                <h3>Карта города</h3>
+                <div id="map"></div>
+            </div>
         </section>
     </main>
 
@@ -58,7 +71,12 @@
             <p>© <span id="currentYear"></span> Разработано ToMaTiK. <a href="https://github.com/ToMaTiKkk/stylish_weather_web_app" target="_blank" rel="noopener noreferrer">GitHub</a></p>
         </div>
     </footer>
-
+    
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+     
     <script src="{{ url_for('static', path='/js/script.js') }}"></script>
 </body>
 </html>

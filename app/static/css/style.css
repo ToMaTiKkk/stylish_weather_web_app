@@ -381,6 +381,30 @@ main {
     background-color: rgba(255, 193, 7, 0.2);
 }
 
+#weather-map-container {
+    margin-top: 2rem;
+    margin-bottom: 1.5rem;
+    background-color: #2A2733; 
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #3A3743;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+#weather-map-container h3 {
+    font-size: 1.3rem;
+    color: #FFC107;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+#map {
+    height: 300px; /* ыысота карты, можно настроить */
+    width: 100%;   /* ширина карты */
+    border-radius: 6px; /* небольшое скругление для самой карты */
+    z-index: 0; /* важно для Leaflet, чтобы элементы управления были поверх */
+}
+
 /* адаптивность */
 @media (max-width: 600px) {
     .app-header h1 {

@@ -98,3 +98,5 @@ dmypy.json
 
 .dockerignore
 docker-compose.override.yml
+
+stylish_weather_app_db
