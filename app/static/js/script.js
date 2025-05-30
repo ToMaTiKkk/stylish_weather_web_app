@@ -7,7 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const weatherForm = document.getElementById('weatherForm')
     const cityInput = document.getElementById('city')
-    const weatherResultsSection = document.getElementById('weather-results-section')
+    //const weatherResultsSection = document.getElementById('weather-results-section')
+    const weatherCardsPlaceholder = document.getElementById('weather-cards-placeholder');
     // от main.py 
     const WMO_CODES = typeof WMO_CODES_FROM_SERVER !== "undefined" ? WMO_CODES_FROM_SERVER : {};
     // элемент для отображения подсказок автодопа и добавим в html если его не было
@@ -26,6 +27,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const lastCitySuggestionContainer = document.getElementById('last-city-suggestion');
     const lastCityNameSpan = document.getElementById('last-city-name');
     const showLastCityButton = document.getElementById('show-last-city-weather');
+    
+    const weatherMapContainer = document.getElementById('weather-map-container');
+    const mapElement = document.getElementById('map');
+    let mapInstance = null; // хранит экземпляр класса карты Leaflet
+    let currentMapMarker = null;
     
     // сохранени последнего города
     function saveLastSearchedCity(cityInfo) {
@@ -208,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 li.textContent = displayText;
                 
                 // сохраняем координаты и точное имя, в data-атрибутах
-                li.dataset.cityNmae = cityData.name;
+                li.dataset.cityName = cityData.name;
                 if (cityData.latitude !== undefined && cityData.longitude !== undefined) {
                     li.dataset.lat = cityData.latitude;
                     li.dataset.lon = cityData.longitude;
@@ -238,7 +244,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (country) {
             displayNameForLoading += `, ${country}`;
         }
-        weatherResultsSection.innerHTML = `<p class="loading-text">Получение прогноза для ${displayNameForLoading}...</p>`;
+        if (weatherCardsPlaceholder) {
+            weatherCardsPlaceholder.innerHTML = `<p class="loading-text">Получение прогноза для ${displayNameForLoading}...</p>`;
+        }
         
         let apiUrl = `/api/weather/${encodeURIComponent(baseName)}`;
 
@@ -270,6 +278,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             displayWeather(data);
             
+            // отображаем карту после получения погоды
+            if (data && data.city_info && data.city_info.latitude !== undefined && data.city_info.longitude !== undefined) {
+                if (weatherMapContainer) {
+                    weatherMapContainer.style.display = 'block';
+                }
+                initOrUpdateMap(data.city_info, data.weather.current_weather); // передаем инфо о городе и текущую погоду
+            } else {
+                if (weatherMapContainer) {
+                    weatherMapContainer.style.display = 'none'; // без координат скрываем
+                }
+            }
             // сохраняем последний город
             if (data && data.city_info) {
                 saveLastSearchedCity(data.city_info)
@@ -282,9 +301,48 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error('Ошибка при получении погоды:', error);
-            weatherResultsSection.innerHTML = `<p class="error-text">Не удалось загрузить погоду: ${error.message}</p>`;
+            //.weatherResultsSection.innerHTML = `<p class="error-text">Не удалось загрузить погоду: ${error.message}</p>`;
+            if (weatherMapContainer) {
+                weatherMapContainer.style.display = 'none';
+            }
         }
     }
+    
+    function initOrUpdateMap(cityInfo, currentWeather) {
+        console.log("Вызвана initOrUpdateMap с:", cityInfo, currentWeather); // ОТЛАДКА
+        const lat = cityInfo.latitude;
+        const lon = cityInfo.longitude;
+        const zoomLevel = 10;
+        
+        if (!mapElement) return;
+        
+        if (!mapInstance) {
+            // инициализируем карту если ещё нет
+            mapInstance = L.map(mapElement).setView([lat, lon], zoomLevel)
+            // добавление тайлов (подложки для карты)
+            L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(mapInstance);
+        } else {
+            // карта есть и просто перемещаем вид
+            mapInstance.setView([lat, lon], zoomLevel);
+        }
+        
+        // старый маркер удаляем и добавляем новый
+        if (currentMapMarker) {
+            mapInstance.removeLayer(currentMapMarker);
+        }
+        currentMapMarker = L.marker([lat, lon]).addTo(mapInstance);
+        
+        // контент для hover маркера
+        let popupContent = `<b>${cityInfo.name}</b>`;
+        if (currentWeather) {
+            const temp = Math.round(currentWeather.temperature)
+            const description = getWmoDescription(currentWeather.weathercode); // своя функция в js
+            popupContent += `<br>${temp}°C, ${description}`;
+        }
+        
+        currentMapMarker.bindPopup(popupContent).openPopup(); // сразу открываем hover
+    }
+    
     if (weatherForm) {
         weatherForm.addEventListener('submit', async (event) => {
             event.preventDefault(); // блокируем стандартную отправку формы
@@ -366,7 +424,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         htmlContent += '</div>';
-        weatherResultsSection.innerHTML = htmlContent;  
+        //weatherResultsSection.innerHTML = htmlContent; 
+        if (weatherCardsPlaceholder) {
+            weatherCardsPlaceholder.innerHTML = htmlContent; // перезаписываем только карточку погоды, карту не трогаем
+        } else {
+            console.error("Элемент #weather-cards-placeholder не найден!")
+        }
     }
     
     function getWmoDescription(code) {
