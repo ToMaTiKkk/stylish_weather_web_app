@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const weatherForm = document.getElementById('weatherForm')
     const cityInput = document.getElementById('city')
-    //const weatherResultsSection = document.getElementById('weather-results-section')
     const weatherCardsPlaceholder = document.getElementById('weather-cards-placeholder');
     // от main.py 
     const WMO_CODES = typeof WMO_CODES_FROM_SERVER !== "undefined" ? WMO_CODES_FROM_SERVER : {};
@@ -309,7 +308,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function initOrUpdateMap(cityInfo, currentWeather) {
-        console.log("Вызвана initOrUpdateMap с:", cityInfo, currentWeather); // ОТЛАДКА
         const lat = cityInfo.latitude;
         const lon = cityInfo.longitude;
         const zoomLevel = 10;
@@ -424,7 +422,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         htmlContent += '</div>';
-        //weatherResultsSection.innerHTML = htmlContent; 
         if (weatherCardsPlaceholder) {
             weatherCardsPlaceholder.innerHTML = htmlContent; // перезаписываем только карточку погоды, карту не трогаем
         } else {
